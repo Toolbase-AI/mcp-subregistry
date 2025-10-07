@@ -1,0 +1,33 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mcp-subregistry",
+  "compatibility_date": "2025-10-06",
+  "main": "src/index.ts",
+  "d1_databases": [
+    {
+      "binding": "REGISTRY_DB",
+      "database_name": "mcp-registry",
+      "database_id": "INSERT DATABASE ID",
+      "migrations_dir": "drizzle",
+      // Local dev environment uses remote D1 instead of the local SQLite
+      "remote": true
+    }
+  ],
+  "triggers": { "crons": ["0 2 * * *"] }, // Daily at 2 AM UTC
+  "env": {
+    "production": {
+      "d1_databases": [
+        {
+          "binding": "REGISTRY_DB",
+          "database_name": "mcp-registry-production",
+          "database_id": "INSERT DATABASE ID",
+          "migrations_dir": "drizzle"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "mcp-subregistry",
+  "version": "0.1.0",
+  "description": "Open-source, self-hostable MCP Registry API built on Cloudflare Workers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "pnpm db:migrate:prod && wrangler deploy",
+    "cf-typegen": "wrangler types",
+    "drizzle-kit": "drizzle-kit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:dev": "wrangler d1 migrations apply REGISTRY_DB --remote",
+    "db:migrate:prod": "wrangler d1 migrations apply REGISTRY_DB --remote -e production",
+    "db:studio": "drizzle-kit studio",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.6",
+    "hono": "^4.9.9",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3",
+    "drizzle-kit": "^0.31.5",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.42.0"
+  },
+  "cloudflare": {
+    "REGISTRY_DB": {
+      "description": "The name for your D1 database that supports the registry"
+    },
+    "CLOUDFLARE_ACCOUNT_ID": {
+      "description": "Your Cloudflare Account ID. Only used for connecting to your D1 with drizzle-kit studio."
+    },
+    "CLOUDFLARE_DATABASE_ID": {
+      "description": "Your remote Cloudflare D1 database ID. Only used for connecting to your D1 with drizzle-kit studio."
+    },
+    "CLOUDFLARE_D1_TOKEN": {
+      "description": "Your Cloudflare access token with D1 edit permissions. Only used for connecting to your D1 with drizzle-kit studio."
+    }
+  }
+}
