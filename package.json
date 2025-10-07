@@ -30,7 +30,7 @@
   "cloudflare": {
     "bindings": {
       "REGISTRY_ADMIN_SECRET": {
-        "description": " Generate a random string using `openssl rand -hex 32`. The secret to include in your requests with the Authorization header to call admin specific operations. Required."
+        "description": " Generate a random string using `openssl rand -hex 32`. Needs to be included for admin requests."
       },
       "REGISTRY_DB": {
         "description": "The name for your D1 database that supports the registry"
