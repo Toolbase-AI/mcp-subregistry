@@ -8,6 +8,13 @@
       "when": 1759805800674,
       "tag": "0000_goofy_justin_hammer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1759838307073,
+      "tag": "0001_swift_dreadnoughts",
+      "breakpoints": true
     }
   ]
 }

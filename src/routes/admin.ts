@@ -159,6 +159,48 @@ admin.delete("/servers/:name/metadata", async (c) => {
 });
 
 /**
+ * PATCH /servers/:name/visibility - Set visibility for package (all versions)
+ * Controls whether a package and its versions are published
+ */
+admin.patch("/servers/:name/visibility", async (c) => {
+  const db = getDatabaseConnection();
+  const { name } = c.req.param();
+
+  try {
+    const { visibility } = await c.req.json<{ visibility: string }>();
+    const decodedName = decodeURIComponent(name);
+
+    // Validate visibility value
+    if (visibility !== "draft" && visibility !== "published") {
+      return c.json(
+        { error: "Invalid visibility value. Must be 'draft' or 'published'" },
+        400
+      );
+    }
+
+    // Upsert packageMetadata with visibility
+    await db
+      .insert(packageMetadata)
+      .values({
+        name: decodedName,
+        visibility,
+      })
+      .onConflictDoUpdate({
+        target: packageMetadata.name,
+        set: {
+          visibility,
+          updatedAt: new Date(),
+        },
+      });
+
+    return c.json({ success: true, visibility });
+  } catch (error) {
+    console.error("Error updating package visibility:", error);
+    return c.json({ error: "Failed to update package visibility" }, 500);
+  }
+});
+
+/**
  * GET /servers/:name/versions/:version/metadata - Get version-specific metadata
  * Returns metadata for a specific server version
  */
@@ -352,6 +394,64 @@ admin.delete("/servers/:name/versions/:version/metadata", async (c) => {
   } catch (error) {
     console.error("Error deleting version metadata:", error);
     return c.json({ error: "Failed to delete version metadata" }, 500);
+  }
+});
+
+/**
+ * PATCH /servers/:name/versions/:version/visibility - Set visibility for specific version
+ * Controls whether a specific server version is published
+ */
+admin.patch("/servers/:name/versions/:version/visibility", async (c) => {
+  const db = getDatabaseConnection();
+  const { name, version } = c.req.param();
+
+  try {
+    const { visibility } = await c.req.json<{ visibility: string }>();
+    const decodedName = decodeURIComponent(name);
+    const decodedVersion = decodeURIComponent(version);
+
+    // Validate visibility value
+    if (visibility !== "draft" && visibility !== "published") {
+      return c.json(
+        { error: "Invalid visibility value. Must be 'draft' or 'published'" },
+        400
+      );
+    }
+
+    // Check if server version exists
+    const [existing] = await db
+      .select({ name: servers.name })
+      .from(servers)
+      .where(
+        and(eq(servers.name, decodedName), eq(servers.version, decodedVersion))
+      )
+      .limit(1);
+
+    if (!existing) {
+      return c.json(
+        {
+          error: "Server version not found",
+          message: "Server version must exist before setting visibility",
+        },
+        404
+      );
+    }
+
+    // Update version visibility
+    await db
+      .update(servers)
+      .set({
+        visibility,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(eq(servers.name, decodedName), eq(servers.version, decodedVersion))
+      );
+
+    return c.json({ success: true, visibility });
+  } catch (error) {
+    console.error("Error updating version visibility:", error);
+    return c.json({ error: "Failed to update version visibility" }, 500);
   }
 });
 

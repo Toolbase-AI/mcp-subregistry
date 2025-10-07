@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, asc, and, SQL, or, gt, desc, is } from "drizzle-orm";
+import { eq, asc, and, SQL, or, gt, desc, isNull, sql } from "drizzle-orm";
 import {
   servers,
   packageMetadata,
@@ -18,16 +18,43 @@ const registry = new Hono<{ Bindings: Env }>();
  */
 registry.get("/servers", async (c) => {
   const db = getDatabaseConnection();
-  const { limit = "10", cursor } = c.req.query();
+  const { limit = "10", cursor, visibility, status } = c.req.query();
 
   try {
-    const limitNum = Number(limit);
+    let limitNum = Number(limit);
+
+    if (Number.isNaN(limitNum) || limitNum <= 0 || limitNum > 100) {
+      limitNum = 10;
+    }
 
     // Build WHERE conditions
-    // Only return active servers.
-    // @fixme - Lets just keep it the same as the official registry for now and return deleted ones.
-    // const conditions = [eq(servers.status, "active")];
     const conditions: (SQL | undefined)[] = [];
+
+    // Apply visibility filter if specified
+    if (visibility === "draft" || visibility === "published") {
+      // Filter by both package and version visibility
+      // If packageMetadata doesn't exist (null), treat as "draft"
+      conditions.push(
+        and(
+          or(
+            eq(packageMetadata.visibility, visibility),
+            visibility === "draft"
+              ? isNull(packageMetadata.visibility)
+              : undefined
+          ),
+          eq(servers.visibility, visibility)
+        )
+      );
+    }
+
+    // Apply status filter if specified
+    if (
+      status === "active" ||
+      status === "deprecated" ||
+      status === "deleted"
+    ) {
+      conditions.push(eq(servers.status, status));
+    }
 
     // Apply cursor (pagination by name:version)
     if (cursor) {
@@ -35,7 +62,6 @@ registry.get("/servers", async (c) => {
       const [cursorName, cursorVersion] = decodedCursor.split(":");
 
       // Pagination: (name > cursorName) OR (name = cursorName AND version > cursorVersion)
-      // sql`(${servers.name} > ${cursorName} OR (${servers.name} = ${cursorName} AND ${servers.version} > ${cursorVersion}))`
       conditions.push(
         or(
           gt(servers.name, cursorName),
@@ -126,13 +152,45 @@ registry.get("/servers/:name", async (c) => {
 registry.get("/servers/:name/versions", async (c) => {
   const db = getDatabaseConnection();
   const { name } = c.req.param();
+  const { visibility, status } = c.req.query();
 
   try {
+    // Build WHERE conditions
+    const conditions: (SQL | undefined)[] = [
+      eq(servers.name, decodeURIComponent(name)),
+    ];
+
+    // Apply visibility filter if specified
+    if (visibility === "draft" || visibility === "published") {
+      // Filter by both package and version visibility
+      // If packageMetadata doesn't exist (null), treat as "draft"
+      conditions.push(
+        and(
+          or(
+            eq(packageMetadata.visibility, visibility),
+            visibility === "draft"
+              ? isNull(packageMetadata.visibility)
+              : undefined
+          ),
+          eq(servers.visibility, visibility)
+        )
+      );
+    }
+
+    // Apply status filter if specified
+    if (
+      status === "active" ||
+      status === "deprecated" ||
+      status === "deleted"
+    ) {
+      conditions.push(eq(servers.status, status));
+    }
+
     const results = await db
       .select()
       .from(servers)
       .leftJoin(packageMetadata, eq(servers.name, packageMetadata.name))
-      .where(eq(servers.name, decodeURIComponent(name)))
+      .where(and(...conditions))
       .orderBy(desc(servers.publishedAt));
 
     if (results.length === 0) {

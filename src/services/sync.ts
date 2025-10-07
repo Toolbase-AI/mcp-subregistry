@@ -52,6 +52,8 @@ export async function syncFromOfficialRegistry(env: Env): Promise<{
             ...transformed,
             // On update, DON'T touch versionRegistryMeta (preserves manual enrichments)
             versionRegistryMeta: sql`${servers.versionRegistryMeta}`,
+            // On update, DON'T touch visibility (preserves manual visibility control)
+            visibility: sql`${servers.visibility}`,
             updatedAt: new Date(),
           },
         });
