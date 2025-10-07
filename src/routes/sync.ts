@@ -1,20 +1,13 @@
 import { Hono } from "hono";
 import { syncFromOfficialRegistry } from "../services/sync";
-import { Variables } from "~/types/app";
 
-const sync = new Hono<{ Bindings: Env; Variables: Variables }>();
+const sync = new Hono<{ Bindings: Env }>();
 
 /**
  * GET /sync - Trigger manual sync
  * Also called by cron trigger
  */
 sync.get("/sync", async (c) => {
-  const user = c.get("user");
-
-  console.log(
-    `Initiating manual sync from ${user?.email ? user.email : "no user"}`
-  );
-
   try {
     const result = await syncFromOfficialRegistry(c.env);
 

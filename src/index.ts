@@ -3,7 +3,7 @@ import { cors } from "hono/cors";
 import registry from "./routes/registry";
 import { syncFromOfficialRegistry } from "./services/sync";
 import sync from "./routes/sync";
-import { cloudflareAccessMiddleware } from "./middleware/cloudflare-access";
+import { secretAuthMiddleware } from "./middleware/secret-auth";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -12,7 +12,7 @@ app.use("/*", cors());
 app.route("/v0", registry); // MCP Registry API (spec-compliant)
 
 // Protected internal sync endpoint
-app.use("/internal/*", cloudflareAccessMiddleware);
+app.use("/internal/*", secretAuthMiddleware);
 app.route("/internal", sync); // Internal sync endpoint
 
 // 404 handler

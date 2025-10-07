@@ -1,6 +1,4 @@
-import { Context, Next } from "hono";
 import { createMiddleware } from "hono/factory";
-import { Bindings } from "hono/types";
 import { jwtVerify, createRemoteJWKSet, JWTPayload } from "jose";
 import { Variables } from "~/types/app";
 
@@ -29,17 +27,26 @@ export const cloudflareAccessMiddleware = createMiddleware<{
   try {
     // Create JWKS from your team domain
     const JWKS = createRemoteJWKSet(
+      // @ts-expect-error
       new URL(`${c.env.CLOUDFLARE_ACCESS_TEAM_DOMAIN}/cdn-cgi/access/certs`)
     );
 
     // Verify the JWT
     const { payload } = await jwtVerify(token, JWKS, {
+      // @ts-expect-error
       issuer: c.env.CLOUDFLARE_ACCESS_TEAM_DOMAIN,
+      // @ts-expect-error
       audience: c.env.CLOUDFLARE_ACCESS_POLICY_AUD,
     });
 
     // Store user info in context for downstream use
     c.set("user", payload);
+
+    console.log(
+      `Initiating admin request from ${
+        payload?.email ? payload.email : "no user"
+      }`
+    );
   } catch (error) {
     // Token verification failed
     return c.json(

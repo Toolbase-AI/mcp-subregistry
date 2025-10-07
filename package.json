@@ -29,6 +29,9 @@
   },
   "cloudflare": {
     "bindings": {
+      "REGISTRY_ADMIN_SECRET": {
+        "description": "The secret to include in your requests with the Authorization header to call admin specific operations. Required."
+      },
       "REGISTRY_DB": {
         "description": "The name for your D1 database that supports the registry"
       },
@@ -40,12 +43,6 @@
       },
       "CLOUDFLARE_D1_TOKEN": {
         "description": "Your Cloudflare access token with D1 edit permissions. Only used for connecting to your D1 with drizzle-kit studio."
-      },
-      "CLOUDFLARE_ACCESS_POLICY_AUD": {
-        "description": "Your application's AUD tag for Cloudflare Access. This is for administrator specific routes."
-      },
-      "CLOUDFLARE_ACCESS_TEAM_DOMAIN": {
-        "description": "Your team domain for Cloudflare Access. This is for administrator specific routes."
       }
     }
   }
