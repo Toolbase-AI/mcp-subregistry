@@ -27,17 +27,19 @@
     "wrangler": "^4.42.0"
   },
   "cloudflare": {
-    "REGISTRY_DB": {
-      "description": "The name for your D1 database that supports the registry"
-    },
-    "CLOUDFLARE_ACCOUNT_ID": {
-      "description": "Your Cloudflare Account ID. Only used for connecting to your D1 with drizzle-kit studio."
-    },
-    "CLOUDFLARE_DATABASE_ID": {
-      "description": "Your remote Cloudflare D1 database ID. Only used for connecting to your D1 with drizzle-kit studio."
-    },
-    "CLOUDFLARE_D1_TOKEN": {
-      "description": "Your Cloudflare access token with D1 edit permissions. Only used for connecting to your D1 with drizzle-kit studio."
+    "bindings": {
+      "REGISTRY_DB": {
+        "description": "The name for your D1 database that supports the registry"
+      },
+      "CLOUDFLARE_ACCOUNT_ID": {
+        "description": "Your Cloudflare Account ID. Only used for connecting to your D1 with drizzle-kit studio."
+      },
+      "CLOUDFLARE_DATABASE_ID": {
+        "description": "Your remote Cloudflare D1 database ID. Only used for connecting to your D1 with drizzle-kit studio."
+      },
+      "CLOUDFLARE_D1_TOKEN": {
+        "description": "Your Cloudflare access token with D1 edit permissions. Only used for connecting to your D1 with drizzle-kit studio."
+      }
     }
   }
 }
