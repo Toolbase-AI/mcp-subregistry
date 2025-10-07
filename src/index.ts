@@ -4,12 +4,17 @@ import registry from "./routes/registry";
 import { syncFromOfficialRegistry } from "./services/sync";
 import sync from "./routes/sync";
 import { secretAuthMiddleware } from "./middleware/secret-auth";
+import admin from "./routes/admin";
 
 const app = new Hono<{ Bindings: Env }>();
 
 app.use("/*", cors());
 
 app.route("/v0", registry); // MCP Registry API (spec-compliant)
+
+// Protected admin routes
+app.use("/admin/*", secretAuthMiddleware);
+app.route("/admin", admin);
 
 // Protected internal sync endpoint
 app.use("/internal/*", secretAuthMiddleware);
