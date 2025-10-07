@@ -50,7 +50,7 @@ wrangler d1 create mcp-registry
 # Generate database migrations
 pnpm db:generate
 
-# Run migrations for development
+# Run migrations for local SQLite development
 pnpm db:migrate:dev
 
 # Run migrations for production
@@ -67,12 +67,6 @@ pnpm dev
 or
 
 ```bash
-# Create production D1 database
-wrangler d1 create mcp-registry-production
-
-# Update wrangler.jsonc with production database ID
-# database_id = "your-production-database-id"
-
 # Run migrations in production
 pnpm db:migrate:prod
 

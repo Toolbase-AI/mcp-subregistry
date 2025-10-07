@@ -10,10 +10,9 @@
   "d1_databases": [
     {
       "binding": "REGISTRY_DB",
-      "database_name": "mcp-registry",
+      "database_name": "mcp-subregistry",
       "database_id": "INSERT DATABASE ID",
-      "migrations_dir": "drizzle",
-      "preview_database_id": "INSERT DATABASE ID"
+      "migrations_dir": "drizzle"
     }
   ],
   "triggers": { "crons": ["0 2 * * *"] } // Daily at 2 AM UTC

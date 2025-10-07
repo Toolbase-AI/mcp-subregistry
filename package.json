@@ -10,8 +10,8 @@
     "cf-typegen": "wrangler types",
     "drizzle-kit": "drizzle-kit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:dev": "wrangler d1 migrations apply REGISTRY_DB --remote",
-    "db:migrate:prod": "wrangler d1 migrations apply REGISTRY_DB --remote -e production",
+    "db:migrate:dev": "wrangler d1 migrations apply REGISTRY_DB",
+    "db:migrate:prod": "wrangler d1 migrations apply REGISTRY_DB --remote",
     "db:studio": "drizzle-kit studio",
     "typecheck": "tsc --noEmit"
   },
