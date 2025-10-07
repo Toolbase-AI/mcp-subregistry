@@ -33,3 +33,6 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# Local wrangler for development
+wrangler.local.jsonc
