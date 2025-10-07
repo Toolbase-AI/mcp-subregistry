@@ -84,6 +84,7 @@ Optional environment variables can be configured in `.env`:
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
+| `REGISTRY_ADMIN_SECRET` | Secret token to be used to make admin requests | Yes | - |
 | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare Account ID. Only used for connecting to your D1 with drizzle-kit studio. | No | - |
 | `CLOUDFLARE_DATABASE_ID` | Your remote Cloudflare D1 database ID. Only used for connecting to your D1 with drizzle-kit studio. | No | - |
 | `CLOUDFLARE_D1_TOKEN` | Your Cloudflare access token with D1 edit permissions. Only used for connecting to your D1 with drizzle-kit studio. | No | - |
