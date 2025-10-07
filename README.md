@@ -1,6 +1,6 @@
 # 🚀 MCP Subregistry
 
-Self-hostable registry / subregistry for the official [MCP Registry](https://github.com/modelcontextprotocol/registry) or any registry.
+Self-hostable MCP registry / subregistry synced with the official [MCP Registry](https://github.com/modelcontextprotocol/registry) or any registry.
 
 Built on Cloudflare Workers for edge performance, with Drizzle ORM and D1 for SQLite persistence.
 
@@ -8,7 +8,7 @@ Built on Cloudflare Workers for edge performance, with Drizzle ORM and D1 for SQ
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange)](https://workers.cloudflare.com/)
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Toolbase-AI/mcp-subregistry)
 
 ## ✨ Features
 
@@ -61,6 +61,10 @@ pnpm dev
 ```
 
 ### Deploy to Cloudflare
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Toolbase-AI/mcp-subregistry)
+
+or
 
 ```bash
 # Create production D1 database
