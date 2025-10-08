@@ -8,20 +8,21 @@ import admin from "./routes/admin";
 import { openAPIRouteHandler } from "hono-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<{ Bindings: Env }>()
+  .use("/*", cors())
+  .use("/admin/*", secretAuthMiddleware)
+  .use("/internal/*", secretAuthMiddleware)
 
-app.use("/*", cors());
+  // MCP Registry API (spec-compliant)
+  .route("/v0", registry)
 
-app.route("/v0", registry); // MCP Registry API (spec-compliant)
+  // Protected admin routes
+  .route("/admin", admin)
 
-// Protected admin routes
-app.use("/admin/*", secretAuthMiddleware);
-app.route("/admin", admin);
+  // Protected internal sync endpoint
+  .route("/internal", sync);
 
-// Protected internal sync endpoint
-app.use("/internal/*", secretAuthMiddleware);
-app.route("/internal", sync); // Internal sync endpoint
-
+// OpenAPI
 app.get(
   "/openapi.json",
   openAPIRouteHandler(app, {
@@ -49,6 +50,7 @@ app.get(
   })
 );
 
+// Scalar Docs for OpenAPI
 app.get(
   "/docs",
   Scalar({
