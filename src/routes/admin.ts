@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { eq, desc, and } from "drizzle-orm";
 import { servers, syncLog, packageMetadata } from "../db/schema";
 import { getDatabaseConnection } from "~/db/connection";
-import { describeRoute, resolver } from "hono-openapi";
+import { describeRoute, resolver, validator } from "hono-openapi";
 import z from "zod";
 
 const admin = new Hono<{ Bindings: Env }>();
@@ -158,12 +158,13 @@ admin.put(
       },
     },
   }),
+  validator("json", z.record(z.string(), z.unknown())),
   async (c) => {
     const db = getDatabaseConnection();
     const { name } = c.req.param();
 
     try {
-      const metadata = await c.req.json();
+      const metadata = c.req.valid("json");
       const decodedName = decodeURIComponent(name);
 
       await db
@@ -217,12 +218,13 @@ admin.patch(
       },
     },
   }),
+  validator("json", z.record(z.string(), z.unknown())),
   async (c) => {
     const db = getDatabaseConnection();
     const { name } = c.req.param();
 
     try {
-      const partialMetadata = await c.req.json();
+      const partialMetadata = c.req.valid("json");
       const decodedName = decodeURIComponent(name);
 
       // Check if server exists
@@ -340,21 +342,14 @@ admin.patch(
       },
     },
   }),
+  validator("json", z.object({ visibility: z.enum(["draft", "published"]) })),
   async (c) => {
     const db = getDatabaseConnection();
     const { name } = c.req.param();
 
     try {
-      const { visibility } = await c.req.json<{ visibility: string }>();
+      const { visibility } = c.req.valid("json");
       const decodedName = decodeURIComponent(name);
-
-      // Validate visibility value
-      if (visibility !== "draft" && visibility !== "published") {
-        return c.json(
-          { error: "Invalid visibility value. Must be 'draft' or 'published'" },
-          400
-        );
-      }
 
       // Upsert packageMetadata with visibility
       await db
@@ -484,12 +479,13 @@ admin.put(
       },
     },
   }),
+  validator("json", z.record(z.string(), z.unknown())),
   async (c) => {
     const db = getDatabaseConnection();
     const { name, version } = c.req.param();
 
     try {
-      const metadata = await c.req.json();
+      const metadata = c.req.valid("json");
       const decodedName = decodeURIComponent(name);
       const decodedVersion = decodeURIComponent(version);
 
@@ -570,12 +566,13 @@ admin.patch(
       },
     },
   }),
+  validator("json", z.record(z.string(), z.unknown())),
   async (c) => {
     const db = getDatabaseConnection();
     const { name, version } = c.req.param();
 
     try {
-      const partialMetadata = await c.req.json();
+      const partialMetadata = c.req.valid("json");
       const decodedName = decodeURIComponent(name);
       const decodedVersion = decodeURIComponent(version);
 
@@ -745,22 +742,15 @@ admin.patch(
       },
     },
   }),
+  validator("json", z.object({ visibility: z.enum(["draft", "published"]) })),
   async (c) => {
     const db = getDatabaseConnection();
     const { name, version } = c.req.param();
 
     try {
-      const { visibility } = await c.req.json<{ visibility: string }>();
+      const { visibility } = c.req.valid("json");
       const decodedName = decodeURIComponent(name);
       const decodedVersion = decodeURIComponent(version);
-
-      // Validate visibility value
-      if (visibility !== "draft" && visibility !== "published") {
-        return c.json(
-          { error: "Invalid visibility value. Must be 'draft' or 'published'" },
-          400
-        );
-      }
 
       // Check if server version exists
       const [existing] = await db
