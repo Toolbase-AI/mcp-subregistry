@@ -5,6 +5,8 @@ import { syncFromOfficialRegistry } from "./services/sync";
 import sync from "./routes/sync";
 import { secretAuthMiddleware } from "./middleware/secret-auth";
 import admin from "./routes/admin";
+import { openAPIRouteHandler } from "hono-openapi";
+import { Scalar } from "@scalar/hono-api-reference";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -19,6 +21,40 @@ app.route("/admin", admin);
 // Protected internal sync endpoint
 app.use("/internal/*", secretAuthMiddleware);
 app.route("/internal", sync); // Internal sync endpoint
+
+app.get(
+  "/openapi.json",
+  openAPIRouteHandler(app, {
+    documentation: {
+      info: {
+        title: "mcp-subregistry",
+        description:
+          "A hosted MCP registry / subregistry synced with the Official MCP Registry or any parent registry.",
+        version: "0.0.1",
+        license: {
+          name: "MIT",
+        },
+      },
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "string",
+            description: "A token is required for admin specific operations.",
+          },
+        },
+      },
+    },
+  })
+);
+
+app.get(
+  "/docs",
+  Scalar({
+    url: "/openapi.json",
+  })
+);
 
 // 404 handler
 app.notFound((c) => {

@@ -1,5 +1,7 @@
 import { Hono } from "hono";
 import { syncFromOfficialRegistry } from "../services/sync";
+import { describeRoute, resolver } from "hono-openapi";
+import z from "zod";
 
 const sync = new Hono<{ Bindings: Env }>();
 
@@ -7,7 +9,44 @@ const sync = new Hono<{ Bindings: Env }>();
  * GET /sync - Trigger manual sync
  * Also called by cron trigger
  */
-sync.get("/sync", async (c) => {
+sync.get(
+  "/sync",
+  describeRoute({
+    tags: ["Admin"],
+    summary: "Trigger manual sync",
+    description: "Manually trigger sync from official MCP registry",
+    responses: {
+      200: {
+        description: "Sync completed successfully",
+        content: {
+          "application/json": {
+            schema: resolver(
+              z.object({
+                success: z.boolean(),
+                message: z.string(),
+                processed: z.number(),
+              })
+            ),
+          },
+        },
+      },
+      500: {
+        description: "Sync failed",
+        content: {
+          "application/json": {
+            schema: resolver(
+              z.object({
+                success: z.boolean(),
+                message: z.string(),
+                error: z.string().optional(),
+              })
+            ),
+          },
+        },
+      },
+    },
+  }),
+  async (c) => {
   try {
     const result = await syncFromOfficialRegistry(c.env);
 
@@ -37,6 +76,7 @@ sync.get("/sync", async (c) => {
       500
     );
   }
-});
+  }
+);
 
 export default sync;
